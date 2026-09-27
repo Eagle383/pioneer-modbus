@@ -219,13 +219,6 @@ template:
           {% if fan in ['unknown', 'unavailable'] %}unavailable
           {% else %}{{ {1: 'stopped', 2: '1', 3: '2', 4: '3', 5: '4', 6: '5', 7: 'turbo', 8: 'silent'}.get(fan | int(0), 'unknown') }}
           {% endif %}
-      - name: Pioneer Unit 2 Setpoint °F
-        unique_id: pioneer_unit_2_setpoint_f
-        unit_of_measurement: "°F"
-        device_class: temperature
-        state: >
-          {% set c = states('sensor.pioneer_unit_2_setpoint') %}
-          {{ (c | float * 9 / 5 + 32) | round(0) if c not in ['unknown', 'unavailable'] else none }}
 
   - binary_sensor:
       - name: Pioneer Unit 2 Power

@@ -125,7 +125,7 @@ You get these entities (prefix `pioneer_unit_2_`; rename freely):
 |---|---|
 | `sensor.…_room_temperature` | Room temperature the unit controls on (°C) |
 | `sensor.…_coil_temperature` | Indoor coil temperature (°C) |
-| `sensor.…_setpoint`, `sensor.…_setpoint_f` | Setpoint in °C and °F |
+| `sensor.…_setpoint` | Setpoint (shown in your HA unit system) |
 | `sensor.…_mode` | off / cool / dry / fan_only / heat / auto (requested) |
 | `sensor.…_active_mode` | What it's actually doing (auto shows heat or cool) |
 | `sensor.…_fan_setting`, `sensor.…_fan_running` | auto, 1–5, silent, turbo; running speed |
