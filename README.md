@@ -125,6 +125,7 @@ You get these entities (prefix `pioneer_unit_2`; rename freely):
 | Entity | Does |
 |---|---|
 | `climate.pioneer_unit_2` | Thermostat: off / cool / heat / auto / dry / fan only, setpoint 16–31 °C in whole degrees, fan speed |
+| `select.pioneer_unit_2_fan` | Fan speed with the remote's labels: Auto, 1–5 (handy for touch dashboards) |
 | `switch.…_eco`, `…_turbo`, `…_silent`, `…_sleep`, `…_display_light` | The remote's function buttons |
 | `sensor.…_room_temperature`, `…_coil_temperature`, `…_setpoint` | Temperatures |
 | `sensor.…_fan_running`, `…_fan_rpm` | Speed the indoor fan is actually running |
@@ -165,6 +166,8 @@ file once it's wired; an unconnected port just logs timeouts.
 | Reply `01 83 02 …` | Working! Exception 02 = that register doesn't exist. Valid ranges are 0x0200–0x02FE and 0x0300–0x03FE. |
 | Garbled or oversized replies | Two clients on the same gateway port. Stop one. |
 | Setpoint looks 1° off | The unit stores whole °C and **truncates** °F from the remote: 69 °F is stored as 20 °C. |
+| Mode doesn't change from a script | `climate.set_temperature` with an `hvac_mode` argument is ignored by Home Assistant's Modbus thermostat. Call `climate.set_hvac_mode` separately. |
+| Compressor shows running on a unit that's off | Register 0x0314 keeps its last value after power-off. The package only counts it while the unit is on. |
 | Room temperature jumps by about 1 °C | "I Feel" on the remote: the unit uses the remote's sensor instead of its own. |
 
 ## Register quick reference
@@ -205,6 +208,8 @@ Confidence levels, unknown registers and the evidence for each entry:
 
 - [x] Controlled write test: function 06 accepted
 - [x] Home Assistant thermostat and function switches
+- [x] Power, mode and setpoint writes confirmed on three units in a cooling test
+- [ ] Fan-speed and function-flag writes (0x0204, 0x0207–0x020A)
 - [ ] Check how the unit handles a non-whole-degree setpoint (e.g. 21.1 °C from a °F user)
 - [ ] Function 16 (multi-register write)
 - [ ] Error-code registers (need a fault to observe)

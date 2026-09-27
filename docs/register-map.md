@@ -10,17 +10,20 @@ Evidence: [captures/port2-decode-session1-notes.md](../captures/port2-decode-ses
 more than once, or across every value tested; **likely** = one clean
 observation that fits; **guess** = plausible only; **unknown** = no idea yet.
 
-**Writes: one register tested.** Function 06 (write single register) to 0x020D
-(display light) was accepted: the unit echoed the frame and the readback changed
-(`01 06 02 0D 00 00 19 B1` → echo, 1 → 0, then restored with `01 06 02 0D 00 01 D8 71`).
-See [captures/bedroom-write-test-fc06.txt](../captures/bedroom-write-test-fc06.txt).
-Other registers have not been written yet.
+**Writes (function 06).** First proven on 0x020D (display light): the unit
+echoed the frame and the readback changed (`01 06 02 0D 00 00 19 B1` → echo,
+1 → 0, then restored with `01 06 02 0D 00 01 D8 71`; see
+[captures/bedroom-write-test-fc06.txt](../captures/bedroom-write-test-fc06.txt)).
+On 2026-09-27, Home Assistant's Modbus thermostat also wrote **0x0201 (power),
+0x0202 (mode) and 0x0203 (setpoint)** on three units, and each unit started,
+changed mode and cooled as commanded. Fan speed (0x0204) and the function flags
+(0x0207-0x020A) have not been written yet.
 
 ## Transport
 
 | Item | Finding |
 |---|---|
-| Function codes | **03** (read holding) and **06** (write single register, tested on 0x020D). 01, 02, 04 get no reply. 16 untested. |
+| Function codes | **03** (read holding) and **06** (write single register; confirmed on 0x0201-0x0203 and 0x020D). 01, 02, 04 get no reply. 16 untested. |
 | Valid addresses | **0x0200–0x02FE** and **0x0300–0x03FE**. Anything else returns exception 02. |
 | Block reads | 100 registers per request works; both blocks read in about 0.5 s. |
 
