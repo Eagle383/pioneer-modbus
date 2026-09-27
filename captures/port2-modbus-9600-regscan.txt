@@ -1,0 +1,7 @@
+fc3: valid=3 other={'exc2': 269}
+  fc3 addr   512 (0x0200) RX 01 03 02 00 00 b8 44
+  fc3 addr   768 (0x0300) RX 01 03 02 00 0c b8 41
+  fc3 addr  1000 (0x03E8) RX 01 03 02 00 00 b8 44
+fc4: valid=0 other={'none': 272}
+fc1: valid=0 other={'none': 272}
+fc2: valid=0 other={'none': 272}

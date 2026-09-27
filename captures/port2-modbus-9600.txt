@@ -1,0 +1,2 @@
+slave 1 fc3 TX 01 03 00 00 00 01 84 0a RX 01 83 02 c0 f1
+modbus 9600 8N1: replies = 1

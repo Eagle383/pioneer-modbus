@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+# Local secrets or gateway credentials, never commit
+*.cred
+.env
