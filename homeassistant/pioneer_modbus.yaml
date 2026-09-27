@@ -216,9 +216,31 @@ template:
           {% else %}{{ {1: 'stopped', 2: '1', 3: '2', 4: '3', 5: '4', 6: '5', 7: 'turbo', 8: 'silent'}.get(fan | int(0), 'unknown') }}
           {% endif %}
 
+  - select:
+      # Fan speed with the remote's labels, for touch dashboards: Auto, 1-5.
+      - name: Pioneer Unit 2 Fan
+        unique_id: pioneer_unit_2_fan_select
+        icon: mdi:fan
+        options: "{{ ['Auto', '1', '2', '3', '4', '5'] }}"
+        state: >
+          {{ {'auto': 'Auto', 'low': '1', 'middle': '2', 'medium': '3', 'high': '4', 'top': '5'}
+             .get(state_attr('climate.pioneer_unit_2', 'fan_mode'), 'Auto') }}
+        select_option:
+          - action: climate.set_fan_mode
+            target:
+              entity_id: climate.pioneer_unit_2
+            data:
+              fan_mode: >
+                {{ {'Auto': 'auto', '1': 'low', '2': 'middle', '3': 'medium', '4': 'high', '5': 'top'}[option] }}
+        availability: "{{ has_value('climate.pioneer_unit_2') }}"
+
   - binary_sensor:
       - name: Pioneer Unit 2 Compressor
         unique_id: pioneer_unit_2_compressor
         device_class: running
-        state: "{{ states('sensor.pioneer_unit_2_compressor_raw') | int(0) > 0 }}"
+        # 0x0314 keeps its last value after the unit is switched off, so it
+        # only counts while the unit is on.
+        state: >
+          {{ states('sensor.pioneer_unit_2_compressor_raw') | int(0) > 0
+             and not is_state('climate.pioneer_unit_2', 'off') }}
         availability: "{{ has_value('sensor.pioneer_unit_2_compressor_raw') }}"

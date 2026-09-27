@@ -65,7 +65,7 @@ The unit stores setpoints in whole °C and **truncates** the remote's °F:
 | **0x030F** | Unit running | 0 off, 1 on | confirmed |
 | **0x0310** | Mode actually running | same codes as 0x0202. In auto (0x0202 = 5) it showed 4 = heat, the mode auto chose. Changed about 3 s before 0x0202 on one step. | likely |
 | **0x0311** | Indoor fan speed actually running | 1 stopped, 2–6 speeds 1–5, 7 turbo, 8 silent (also seen in heat warm-up) | likely |
-| **0x0314** | Compressor | 8 running, 0 stopped (one start and one stop observed) | likely |
+| **0x0314** | Compressor | 8 running, 0 stopped **while the unit is on**. After the unit is switched off it can keep reading 8 for minutes while the coil warms back up, so ignore it when 0x0201 = 0. | likely |
 | **0x0316** | Indoor fan target RPM | 0 off, 950 silent, 1000/1050/1100/1120/1150 speeds 1–5, 1200 turbo, 850 heat warm-up; auto varies | confirmed |
 | **0x0317** | Indoor fan actual RPM | tracks 0x0316 (ramped 742 → 1100 on start-up) | confirmed |
 | **0x0318** | Room temperature used for control | (v − 1000)/10 °C. Unit's own return-air sensor, or the remote's reading while I Feel is on (22.8 → 24.0 °C). Keeps reporting while the unit is off. | confirmed |
