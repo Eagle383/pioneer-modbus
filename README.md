@@ -9,11 +9,10 @@ These units are built by **TCL** (Pioneer's own service manual calls them the TC
 not the Midea XYE/CCM protocol that most Pioneer DIY guides describe. As far as we
 know, this is the first public documentation of it.
 
-> **Status:** reading works. Power, mode, setpoint, fan speed, turbo, silent,
-> eco, sleep, display, timer, room and coil temperature, fan RPM, the mode
-> actually running and compressor state are all decoded. **Writing (controlling
-> the unit) has not been tested yet**, so the Home Assistant package is
-> read-only. Details: [docs/register-map.md](docs/register-map.md).
+> **Status:** reading is fully decoded and **writing works** (Modbus function 06,
+> confirmed on the display register). The Home Assistant package gives each unit a
+> thermostat (power, mode, setpoint, fan speed) and switches for eco, turbo,
+> silent, sleep and the display light. Details: [docs/register-map.md](docs/register-map.md).
 
 ---
 
@@ -106,7 +105,9 @@ register that changes is printed with a timestamp. Stop with Ctrl-C.
 ## Step 6: Add it to Home Assistant
 
 The package [homeassistant/pioneer_modbus.yaml](homeassistant/pioneer_modbus.yaml)
-uses Home Assistant's built-in Modbus integration (`rtuovertcp`) and **only reads**.
+uses Home Assistant's built-in Modbus integration (`rtuovertcp`). It **reads and
+writes**: the thermostat and switches send Modbus function 06 writes when you
+use them. Delete its `climates:` and `switches:` sections for a read-only install.
 
 1. **Enable packages** if you haven't already. In `configuration.yaml`:
    ```yaml
@@ -119,19 +120,30 @@ uses Home Assistant's built-in Modbus integration (`rtuovertcp`) and **only read
 4. **Check and restart:** Developer Tools → YAML → Check configuration, then restart.
 5. **Stop any other client** on that gateway port (including `tcl_modbus.py`).
 
-You get these entities (prefix `pioneer_unit_2_`; rename freely):
+You get these entities (prefix `pioneer_unit_2`; rename freely):
 
-| Entity | Shows |
+| Entity | Does |
 |---|---|
-| `sensor.…_room_temperature` | Room temperature the unit controls on (°C) |
-| `sensor.…_coil_temperature` | Indoor coil temperature (°C) |
-| `sensor.…_setpoint` | Setpoint (shown in your HA unit system) |
-| `sensor.…_mode` | off / cool / dry / fan_only / heat / auto (requested) |
-| `sensor.…_active_mode` | What it's actually doing (auto shows heat or cool) |
-| `sensor.…_fan_setting`, `sensor.…_fan_running` | auto, 1–5, silent, turbo; running speed |
-| `sensor.…_fan_rpm` | Indoor fan RPM |
-| `binary_sensor.…_power`, `…_compressor` | Unit on; compressor running |
-| `binary_sensor.…_eco`, `…_turbo`, `…_silent`, `…_sleep`, `…_display_light` | Feature flags |
+| `climate.pioneer_unit_2` | Thermostat: off / cool / heat / auto / dry / fan only, setpoint 16–31 °C in whole degrees, fan speed |
+| `switch.…_eco`, `…_turbo`, `…_silent`, `…_sleep`, `…_display_light` | The remote's function buttons |
+| `sensor.…_room_temperature`, `…_coil_temperature`, `…_setpoint` | Temperatures |
+| `sensor.…_fan_running`, `…_fan_rpm` | Speed the indoor fan is actually running |
+| `binary_sensor.…_compressor` | Compressor running |
+
+Fan speeds use Home Assistant's fixed fan-mode names:
+
+| Remote | Home Assistant |
+|---|---|
+| auto | auto |
+| 1 | low |
+| 2 | middle |
+| 3 | medium |
+| 4 | high |
+| 5 | top |
+
+Silent and turbo are separate switches, as on the unit itself. The unit stores
+whole °C only; with Home Assistant in °F, set whole-degree values that match
+°C steps where possible.
 
 **Several units:** give each unit its own gateway serial port (each can stay at
 Modbus address 1), then generate one package file per unit:
@@ -191,9 +203,10 @@ Confidence levels, unknown registers and the evidence for each entry:
 
 ## Roadmap
 
-- [ ] Controlled write test (one register, e.g. the display light) to learn
-      whether function 06/16 is accepted
-- [ ] Home Assistant `climate` entity once writes are proven
+- [x] Controlled write test: function 06 accepted
+- [x] Home Assistant thermostat and function switches
+- [ ] Check how the unit handles a non-whole-degree setpoint (e.g. 21.1 °C from a °F user)
+- [ ] Function 16 (multi-register write)
 - [ ] Error-code registers (need a fault to observe)
 - [ ] How to change the unit's Modbus address (for several units on one bus)
 

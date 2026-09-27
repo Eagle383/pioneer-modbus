@@ -1,21 +1,23 @@
-# Pioneer (TCL-built) ducted indoor unit: read-only Home Assistant package
+# Pioneer (TCL-built) ducted indoor unit: Home Assistant package
 #
-# Reads one indoor unit over an RS485-to-TCP gateway using Home Assistant's
-# built-in Modbus integration. It only READS registers; nothing here can
-# change the unit's settings.
+# One indoor unit over an RS485-to-TCP gateway, using Home Assistant's built-in
+# Modbus integration. Gives a thermostat (climate entity), switches for the
+# eco/turbo/silent/sleep/display functions, and status sensors.
+#
+# The thermostat and switches WRITE to the unit with Modbus function 06, which
+# the unit accepts (tested on the display register). Remove the climates: and
+# switches: sections if you want a read-only install.
 #
 # Install: see README.md, "Step 6". In short:
 #   1. Enable packages in configuration.yaml:
 #        homeassistant:
 #          packages: !include_dir_named packages
-#   2. Copy this file to /config/packages/pioneer_modbus.yaml
-#   3. Set HOST and PORT below to your gateway, then restart Home Assistant.
+#   2. Copy this file to /config/packages/ (or generate one per unit with
+#      tools/make_ha_package.py).
+#   3. Set host and port below, then restart Home Assistant.
 #
 # Only ONE Modbus client may talk to a gateway port at a time. While Home
 # Assistant is polling, don't run tools/tcl_modbus.py on the same port.
-#
-# More than one unit: copy the hub block (new name, port) and the sensors,
-# replacing "unit_2" / "Unit 2" with a new identifier.
 
 modbus:
   - name: pioneer_unit_2
@@ -25,8 +27,114 @@ modbus:
     timeout: 3
     delay: 1
     message_wait_milliseconds: 50
+
+    climates:
+      - name: Pioneer Unit 2
+        unique_id: pioneer_unit_2_climate
+        device_address: 1
+        address: 792                  # 0x0318 room temperature
+        input_type: holding
+        data_type: uint16
+        current_temp_scale: 0.1       # (raw - 1000) / 10 °C
+        current_temp_offset: -100
+        target_temp_register: 515     # 0x0203 setpoint, °C x 10
+        target_temp_scale: 0.1
+        target_temp_offset: 0
+        precision: 1
+        temperature_unit: C
+        min_temp: 16                  # unit limits (0x0216 / 0x0215)
+        max_temp: 31
+        temp_step: 1                  # the unit stores whole °C only
+        hvac_onoff_register: 513      # 0x0201: 0 off, 1 on
+        hvac_mode_register:
+          address: 514                # 0x0202
+          values:
+            state_cool: 1
+            state_dry: 2
+            state_fan_only: 3
+            state_heat: 4
+            state_auto: 5
+        # No hvac_action_register: 0x0310 keeps its last mode while the unit is
+        # off, so HA would show "cooling" on a unit that is switched off.
+        fan_mode_register:
+          address: 516                # 0x0204. HA's fixed names map to speeds 1-5:
+          values:
+            state_fan_auto: 1
+            state_fan_low: 2          # speed 1
+            state_fan_middle: 3       # speed 2
+            state_fan_medium: 4       # speed 3
+            state_fan_high: 5         # speed 4
+            state_fan_top: 6          # speed 5
+        scan_interval: 10
+
+    switches:
+      - name: Pioneer Unit 2 Eco
+        unique_id: pioneer_unit_2_eco_switch
+        device_address: 1
+        address: 521                  # 0x0209
+        write_type: holding
+        command_on: 1
+        command_off: 0
+        verify:
+          input_type: holding
+          address: 521
+          state_on: 1
+          state_off: 0
+        scan_interval: 15
+      - name: Pioneer Unit 2 Turbo
+        unique_id: pioneer_unit_2_turbo_switch
+        device_address: 1
+        address: 519                  # 0x0207
+        write_type: holding
+        command_on: 1
+        command_off: 0
+        verify:
+          input_type: holding
+          address: 519
+          state_on: 1
+          state_off: 0
+        scan_interval: 15
+      - name: Pioneer Unit 2 Silent
+        unique_id: pioneer_unit_2_silent_switch
+        device_address: 1
+        address: 520                  # 0x0208
+        write_type: holding
+        command_on: 1
+        command_off: 0
+        verify:
+          input_type: holding
+          address: 520
+          state_on: 1
+          state_off: 0
+        scan_interval: 15
+      - name: Pioneer Unit 2 Sleep
+        unique_id: pioneer_unit_2_sleep_switch
+        device_address: 1
+        address: 522                  # 0x020A
+        write_type: holding
+        command_on: 1
+        command_off: 0
+        verify:
+          input_type: holding
+          address: 522
+          state_on: 1
+          state_off: 0
+        scan_interval: 15
+      - name: Pioneer Unit 2 Display Light
+        unique_id: pioneer_unit_2_display_switch
+        device_address: 1
+        address: 525                  # 0x020D stores "display OFF": 0 = lit
+        write_type: holding
+        command_on: 0
+        command_off: 1
+        verify:
+          input_type: holding
+          address: 525
+          state_on: 0
+          state_off: 1
+        scan_interval: 30
+
     sensors:
-      # ---- Measurements (0x0300 block) ----
       - name: Pioneer Unit 2 Room Temperature
         unique_id: pioneer_unit_2_room_temperature
         device_address: 1
@@ -53,34 +161,6 @@ modbus:
         device_class: temperature
         state_class: measurement
         scan_interval: 15
-      - name: Pioneer Unit 2 Fan RPM
-        unique_id: pioneer_unit_2_fan_rpm
-        device_address: 1
-        address: 791          # 0x0317: indoor fan actual RPM
-        input_type: holding
-        data_type: uint16
-        unit_of_measurement: "rpm"
-        state_class: measurement
-        scan_interval: 15
-      - name: Pioneer Unit 2 Fan Target RPM
-        unique_id: pioneer_unit_2_fan_target_rpm
-        device_address: 1
-        address: 790          # 0x0316
-        input_type: holding
-        data_type: uint16
-        unit_of_measurement: "rpm"
-        scan_interval: 30
-      - name: Pioneer Unit 2 Timer Remaining
-        unique_id: pioneer_unit_2_timer_remaining
-        device_address: 1
-        address: 800          # 0x0320: minutes (countdown not yet verified)
-        input_type: holding
-        data_type: uint16
-        unit_of_measurement: "min"
-        device_class: duration
-        scan_interval: 60
-
-      # ---- Settings (0x0200 block) ----
       - name: Pioneer Unit 2 Setpoint
         unique_id: pioneer_unit_2_setpoint
         device_address: 1
@@ -92,36 +172,24 @@ modbus:
         unit_of_measurement: "°C"
         device_class: temperature
         scan_interval: 15
-
-      # ---- Raw codes, turned into readable states by the templates below ----
-      - name: Pioneer Unit 2 Power Raw
-        unique_id: pioneer_unit_2_power_raw
+      - name: Pioneer Unit 2 Fan RPM
+        unique_id: pioneer_unit_2_fan_rpm
         device_address: 1
-        address: 513          # 0x0201: 0 off, 1 on
+        address: 791          # 0x0317: indoor fan actual RPM
         input_type: holding
         data_type: uint16
-        scan_interval: 10
-      - name: Pioneer Unit 2 Mode Raw
-        unique_id: pioneer_unit_2_mode_raw
-        device_address: 1
-        address: 514          # 0x0202: requested mode
-        input_type: holding
-        data_type: uint16
-        scan_interval: 10
-      - name: Pioneer Unit 2 Active Mode Raw
-        unique_id: pioneer_unit_2_active_mode_raw
-        device_address: 1
-        address: 784          # 0x0310: mode actually running (auto -> heat/cool)
-        input_type: holding
-        data_type: uint16
-        scan_interval: 10
-      - name: Pioneer Unit 2 Fan Setting Raw
-        unique_id: pioneer_unit_2_fan_setting_raw
-        device_address: 1
-        address: 516          # 0x0204: 1 auto, 2-6 speed 1-5
-        input_type: holding
-        data_type: uint16
+        unit_of_measurement: "rpm"
+        state_class: measurement
         scan_interval: 15
+      - name: Pioneer Unit 2 Timer Remaining
+        unique_id: pioneer_unit_2_timer_remaining
+        device_address: 1
+        address: 800          # 0x0320: minutes (countdown not yet verified)
+        input_type: holding
+        data_type: uint16
+        unit_of_measurement: "min"
+        device_class: duration
+        scan_interval: 60
       - name: Pioneer Unit 2 Fan Running Raw
         unique_id: pioneer_unit_2_fan_running_raw
         device_address: 1
@@ -129,13 +197,6 @@ modbus:
         input_type: holding
         data_type: uint16
         scan_interval: 15
-      - name: Pioneer Unit 2 Unit Running Raw
-        unique_id: pioneer_unit_2_unit_running_raw
-        device_address: 1
-        address: 783          # 0x030F: 0/1
-        input_type: holding
-        data_type: uint16
-        scan_interval: 10
       - name: Pioneer Unit 2 Compressor Raw
         unique_id: pioneer_unit_2_compressor_raw
         device_address: 1
@@ -143,74 +204,9 @@ modbus:
         input_type: holding
         data_type: uint16
         scan_interval: 10
-      - name: Pioneer Unit 2 Turbo Raw
-        unique_id: pioneer_unit_2_turbo_raw
-        device_address: 1
-        address: 519          # 0x0207
-        input_type: holding
-        data_type: uint16
-        scan_interval: 30
-      - name: Pioneer Unit 2 Silent Raw
-        unique_id: pioneer_unit_2_silent_raw
-        device_address: 1
-        address: 520          # 0x0208
-        input_type: holding
-        data_type: uint16
-        scan_interval: 30
-      - name: Pioneer Unit 2 Eco Raw
-        unique_id: pioneer_unit_2_eco_raw
-        device_address: 1
-        address: 521          # 0x0209
-        input_type: holding
-        data_type: uint16
-        scan_interval: 30
-      - name: Pioneer Unit 2 Sleep Raw
-        unique_id: pioneer_unit_2_sleep_raw
-        device_address: 1
-        address: 522          # 0x020A
-        input_type: holding
-        data_type: uint16
-        scan_interval: 30
-      - name: Pioneer Unit 2 Display Off Raw
-        unique_id: pioneer_unit_2_display_off_raw
-        device_address: 1
-        address: 525          # 0x020D: 0 lit, 1 dark
-        input_type: holding
-        data_type: uint16
-        scan_interval: 60
 
 template:
   - sensor:
-      - name: Pioneer Unit 2 Mode
-        unique_id: pioneer_unit_2_mode
-        icon: mdi:hvac
-        state: >
-          {% set power = states('sensor.pioneer_unit_2_power_raw') %}
-          {% set mode = states('sensor.pioneer_unit_2_mode_raw') %}
-          {% if power in ['unknown', 'unavailable'] or mode in ['unknown', 'unavailable'] %}unavailable
-          {% elif power | int(0) == 0 %}off
-          {% else %}{{ {1: 'cool', 2: 'dry', 3: 'fan_only', 4: 'heat', 5: 'auto'}.get(mode | int(0), 'unknown') }}
-          {% endif %}
-      - name: Pioneer Unit 2 Active Mode
-        unique_id: pioneer_unit_2_active_mode
-        icon: mdi:hvac
-        state: >
-          {% set running = states('sensor.pioneer_unit_2_unit_running_raw') %}
-          {% set mode = states('sensor.pioneer_unit_2_active_mode_raw') %}
-          {% if running in ['unknown', 'unavailable'] or mode in ['unknown', 'unavailable'] %}unavailable
-          {% elif running | int(0) == 0 %}off
-          {% else %}{{ {1: 'cool', 2: 'dry', 3: 'fan_only', 4: 'heat', 5: 'auto'}.get(mode | int(0), 'unknown') }}
-          {% endif %}
-      - name: Pioneer Unit 2 Fan Setting
-        unique_id: pioneer_unit_2_fan_setting
-        icon: mdi:fan
-        state: >
-          {% set fan = states('sensor.pioneer_unit_2_fan_setting_raw') %}
-          {% if fan in ['unknown', 'unavailable'] %}unavailable
-          {% elif is_state('sensor.pioneer_unit_2_turbo_raw', '1') %}turbo
-          {% elif is_state('sensor.pioneer_unit_2_silent_raw', '1') %}silent
-          {% else %}{{ {1: 'auto', 2: '1', 3: '2', 4: '3', 5: '4', 6: '5'}.get(fan | int(0), 'unknown') }}
-          {% endif %}
       - name: Pioneer Unit 2 Fan Running
         unique_id: pioneer_unit_2_fan_running
         icon: mdi:fan-auto
@@ -221,34 +217,8 @@ template:
           {% endif %}
 
   - binary_sensor:
-      - name: Pioneer Unit 2 Power
-        unique_id: pioneer_unit_2_power
-        device_class: power
-        state: "{{ states('sensor.pioneer_unit_2_power_raw') | int(0) == 1 }}"
-        availability: "{{ has_value('sensor.pioneer_unit_2_power_raw') }}"
       - name: Pioneer Unit 2 Compressor
         unique_id: pioneer_unit_2_compressor
         device_class: running
         state: "{{ states('sensor.pioneer_unit_2_compressor_raw') | int(0) > 0 }}"
         availability: "{{ has_value('sensor.pioneer_unit_2_compressor_raw') }}"
-      - name: Pioneer Unit 2 Turbo
-        unique_id: pioneer_unit_2_turbo
-        state: "{{ states('sensor.pioneer_unit_2_turbo_raw') | int(0) == 1 }}"
-        availability: "{{ has_value('sensor.pioneer_unit_2_turbo_raw') }}"
-      - name: Pioneer Unit 2 Silent
-        unique_id: pioneer_unit_2_silent
-        state: "{{ states('sensor.pioneer_unit_2_silent_raw') | int(0) == 1 }}"
-        availability: "{{ has_value('sensor.pioneer_unit_2_silent_raw') }}"
-      - name: Pioneer Unit 2 Eco
-        unique_id: pioneer_unit_2_eco
-        state: "{{ states('sensor.pioneer_unit_2_eco_raw') | int(0) == 1 }}"
-        availability: "{{ has_value('sensor.pioneer_unit_2_eco_raw') }}"
-      - name: Pioneer Unit 2 Sleep
-        unique_id: pioneer_unit_2_sleep
-        state: "{{ states('sensor.pioneer_unit_2_sleep_raw') | int(0) == 1 }}"
-        availability: "{{ has_value('sensor.pioneer_unit_2_sleep_raw') }}"
-      - name: Pioneer Unit 2 Display Light
-        unique_id: pioneer_unit_2_display_light
-        device_class: light
-        state: "{{ states('sensor.pioneer_unit_2_display_off_raw') | int(1) == 0 }}"
-        availability: "{{ has_value('sensor.pioneer_unit_2_display_off_raw') }}"
