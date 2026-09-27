@@ -1,0 +1,5 @@
+before: 0x020D = 1
+TX 01 06 02 0D 00 00 19 B1
+RX 01 06 02 0D 00 00 19 B1
+readback: 0x020D = 0  -> write ACCEPTED
+restore TX 01 06 02 0D 00 01 D8 71 RX 01 06 02 0D 00 01 D8 71; now 0x020D = 1
