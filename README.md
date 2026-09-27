@@ -133,9 +133,17 @@ You get these entities (prefix `pioneer_unit_2_`; rename freely):
 | `binary_sensor.…_power`, `…_compressor` | Unit on; compressor running |
 | `binary_sensor.…_eco`, `…_turbo`, `…_silent`, `…_sleep`, `…_display_light` | Feature flags |
 
-**Several units:** give each its own gateway port, copy the `modbus:` hub entry
-with a new `name` and `port`, and copy the sensors with a new identifier
-(e.g. `unit_3`). Every unit can stay at Modbus address 1 when each has its own port.
+**Several units:** give each unit its own gateway serial port (each can stay at
+Modbus address 1), then generate one package file per unit:
+
+```sh
+python3 tools/make_ha_package.py --host <gateway-ip> --out build/ \
+    bedroom:Bedroom:23 bathroom:Bathroom:26 living_room:"Living Room":29
+```
+
+Copy the files from `build/` to `/config/packages/`. Entities are named after
+each unit, e.g. `sensor.pioneer_bedroom_room_temperature`. Only install a unit's
+file once it's wired; an unconnected port just logs timeouts.
 
 ## Troubleshooting
 
@@ -177,6 +185,7 @@ Confidence levels, unknown registers and the evidence for each entry:
 | [docs/register-map.md](docs/register-map.md) | Full register map with confidence levels |
 | [homeassistant/](homeassistant/) | Read-only Home Assistant package |
 | [tools/tcl_modbus.py](tools/tcl_modbus.py) | Read-only probe: `scan`, `dump`, `watch` |
+| [tools/make_ha_package.py](tools/make_ha_package.py) | Generates a Home Assistant package per unit |
 | [captures/](captures/) | Raw logs behind every finding; start with `port2-decode-session1-notes.md` |
 | `docs/archive/`, `tools/archive/` | The Midea XYE attempt that does **not** work on these units |
 
