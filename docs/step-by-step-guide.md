@@ -285,7 +285,7 @@ port just fills the log with errors.
 
 **Where to see errors:** **Settings → System → Logs**. Search for **modbus**.
 
-### Still stuck?
+### No support
 
 This project is shared as-is, and **no support is offered**. It was built and
 tested on one owner's equipment, so problems with other units, gateways or
