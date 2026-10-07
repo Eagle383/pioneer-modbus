@@ -208,7 +208,6 @@ Confidence levels, unknown registers and the evidence for each entry:
 | [tools/tcl_modbus.py](tools/tcl_modbus.py) | Read-only probe: `scan`, `dump`, `watch` |
 | [tools/make_ha_package.py](tools/make_ha_package.py) | Generates a Home Assistant package per unit |
 | [captures/](captures/) | Raw logs behind every finding; start with `port2-decode-session1-notes.md` |
-| `docs/archive/`, `tools/archive/` | The Midea XYE attempt that does **not** work on these units |
 
 ## Roadmap
 

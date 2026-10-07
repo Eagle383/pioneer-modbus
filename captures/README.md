@@ -12,4 +12,4 @@ Raw logs behind the findings in `docs/`. All from one unit on gateway serial por
 | `port2-decode-session1-notes.md` | **Start here:** timeline of remote actions and the registers each one changed |
 | `port2-decode-session1.jsonl` | Machine-readable baseline and every change during that session |
 | `port2-decode-session1-part1.log`, `-part2.log` | Watch console output for the session |
-| `archive/` | The negative results: Midea XYE scans and Modbus at 4800 baud, no bytes returned |
+| `archive/port2-modbus-4800.txt` | Modbus at 4800 baud: no bytes returned (the unit only answers at 9600) |

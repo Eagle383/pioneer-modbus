@@ -43,7 +43,7 @@ service manual requires shielded cable to a central controller, shield grounded)
 | Format | 8 data bits, no parity, 1 stop bit |
 | Unit address | **1** (factory default; how to change it is not yet known) |
 
-At 4800 baud the unit is completely silent, to both Modbus and XYE frames.
+At 4800 baud the unit is completely silent.
 
 ## RS485-to-Ethernet gateway
 
@@ -62,7 +62,6 @@ Any transparent RS485-to-TCP bridge, or a USB RS485 adapter, should work the sam
 
 | Attempt | Result |
 |---|---|
-| Midea XYE query frames (0xC0) to IDs 0x00–0x3F, direction byte 0x80 and 0x00, 4800 8N1 | no bytes at all |
 | Modbus RTU reads to addresses 1–32 at 4800 8N1 | no bytes at all |
 | Modbus function 04 / 01 / 02 at 9600 | no reply |
 | Modbus function 03, register 0 | exception 02 (the first sign of life) |
