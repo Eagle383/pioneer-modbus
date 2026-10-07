@@ -287,10 +287,12 @@ port just fills the log with errors.
 
 ### Still stuck?
 
-Open an issue on the
-[GitHub project](https://github.com/Eagle383/pioneer-modbus/issues) and include:
-your unit's model number, your gateway's make and model, which socket you used
-(CN20 or CN20-1), and a screenshot of the gateway's serial port settings.
+This project is shared as-is, and **no support is offered**. It was built and
+tested on one owner's equipment, so problems with other units, gateways or
+installs can't be diagnosed here. For wiring or the unit itself, ask a
+qualified HVAC technician; for Home Assistant, the
+[Home Assistant community forum](https://community.home-assistant.io/) is the
+best place to ask.
 
 ---
 

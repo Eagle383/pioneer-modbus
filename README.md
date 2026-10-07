@@ -24,7 +24,7 @@ know, this is the first public documentation of it.
 
 | Item | Notes |
 |---|---|
-| Pioneer RT-series ducted indoor unit | Tested on an RT0xxGLSILCFHG (RT009/RT018 family). Other TCL-built Pioneer units may work; please report. |
+| Pioneer RT-series ducted indoor unit | Tested on an RT0xxGLSILCFHG (RT009/RT018 family). Other TCL-built Pioneer units may work, but are untested. |
 | RS485-to-Ethernet gateway | Must support **transparent TCP server** mode (raw serial over TCP). Tested: Linovision IOT-C104 (USR-based). A USR-TCP232, Waveshare RS485-to-ETH, or a USB RS485 adapter with small changes should also work. |
 | Cable | 3-conductor, ideally shielded twisted pair (A/B on the pair, G on the third) |
 | A computer with Python 3.9+ | For testing; the tool uses only the standard library |
@@ -220,11 +220,12 @@ Confidence levels, unknown registers and the evidence for each entry:
 - [ ] Error-code registers (need a fault to observe)
 - [ ] How to change the unit's Modbus address (for several units on one bus)
 
-## Contributing
+## Support
 
-Captures from other units are the most useful contribution: run `watch` while
-changing one setting at a time, note what you changed and when, and open an
-issue or PR with the file.
+None. This is shared as-is from one owner's installation, with no access to
+other units, so support requests, issues and pull requests can't be answered.
+You're free to fork it and adapt it (MIT licence). To decode a different unit
+yourself, run `watch` while changing one setting at a time on the remote.
 
 ## Safety and disclaimer
 
