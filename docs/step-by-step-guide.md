@@ -294,6 +294,10 @@ qualified HVAC technician; for Home Assistant, the
 [Home Assistant community forum](https://community.home-assistant.io/) is the
 best place to ask.
 
+**Like working with AI?** An assistant such as Claude can walk you through your
+own setup step by step. Use the [ready-made prompt](ai-assistant/prompt.md)
+together with the [context file](ai-assistant/context.md).
+
 ---
 
 ## Optional: test the wiring from a computer first

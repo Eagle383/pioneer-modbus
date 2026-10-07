@@ -12,6 +12,11 @@ know, this is the first public documentation of it.
 > **New to this?** Follow the **[step-by-step guide](docs/step-by-step-guide.md)**.
 > It needs no programming or command line: wiring, gateway setup and Home
 > Assistant, one click at a time. The rest of this page is the technical version.
+>
+> **Like working with AI?** Give an assistant such as Claude the
+> [ready-made prompt](docs/ai-assistant/prompt.md) and
+> [context file](docs/ai-assistant/context.md), and it can walk you through
+> your own setup.
 
 > **Status:** reading is fully decoded and **writing works** (Modbus function 06,
 > confirmed on the display register). The Home Assistant package gives each unit a
@@ -204,6 +209,7 @@ Confidence levels, unknown registers and the evidence for each entry:
 | [docs/hardware-setup.md](docs/hardware-setup.md) | Board connectors, wiring, gateway settings, what didn't work |
 | [docs/register-map.md](docs/register-map.md) | Full register map with confidence levels |
 | [docs/step-by-step-guide.md](docs/step-by-step-guide.md) | Beginner guide: wiring to dashboard, no command line |
+| [docs/ai-assistant/](docs/ai-assistant/) | Prompt and context file for getting help from an AI assistant |
 | [homeassistant/](homeassistant/) | Home Assistant package: thermostat, function switches, sensors |
 | [tools/tcl_modbus.py](tools/tcl_modbus.py) | Read-only probe: `scan`, `dump`, `watch` |
 | [tools/make_ha_package.py](tools/make_ha_package.py) | Generates a Home Assistant package per unit |
@@ -224,7 +230,9 @@ Confidence levels, unknown registers and the evidence for each entry:
 
 None. This is shared as-is from one owner's installation, with no access to
 other units, so support requests, issues and pull requests can't be answered.
-You're free to fork it and adapt it (MIT licence). To decode a different unit
+You're free to fork it and adapt it (MIT licence). For help with your own
+setup, an AI assistant with the [prompt and context file](docs/ai-assistant/prompt.md)
+is the best option. To decode a different unit
 yourself, run `watch` while changing one setting at a time on the remote.
 
 ## Safety and disclaimer
