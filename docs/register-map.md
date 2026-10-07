@@ -84,6 +84,10 @@ All other registers read 0 in every capture so far.
 - **Outdoor data** (outdoor air or coil temperature, compressor frequency, outdoor
   fan): nothing that looks like it. The indoor unit may not expose it.
 - **Error codes**: no fault occurred during testing.
+- **I Feel on/off**: no register reports it. Toggling I Feel on the remote
+  changed only 0x0318, whose value switches to the remote's temperature, so
+  I Feel can't be read or switched over Modbus. Whether the unit accepts a
+  room temperature written to 0x0318 is untested.
 - **Swing/louvre**: ducted units have none.
 - **How to change the unit's Modbus address** (needed for daisy-chaining several
   units on one bus). Here each unit is on its own gateway port, all at address 1.
