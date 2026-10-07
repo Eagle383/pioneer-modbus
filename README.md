@@ -9,6 +9,10 @@ These units are built by **TCL** (Pioneer's own service manual calls them the TC
 not the Midea XYE/CCM protocol that most Pioneer DIY guides describe. As far as we
 know, this is the first public documentation of it.
 
+> **New to this?** Follow the **[step-by-step guide](docs/step-by-step-guide.md)**.
+> It needs no programming or command line: wiring, gateway setup and Home
+> Assistant, one click at a time. The rest of this page is the technical version.
+
 > **Status:** reading is fully decoded and **writing works** (Modbus function 06,
 > confirmed on the display register). The Home Assistant package gives each unit a
 > thermostat (power, mode, setpoint, fan speed) and switches for eco, turbo,
@@ -115,7 +119,8 @@ use them. Delete its `climates:` and `switches:` sections for a read-only instal
      packages: !include_dir_named packages
    ```
 2. **Copy** `homeassistant/pioneer_modbus.yaml` to `/config/packages/` (File
-   editor, Studio Code Server, Samba or SSH add-on).
+   editor, Studio Code Server, Samba or SSH app; Home Assistant 2026.2 renamed
+   add-ons to apps). Click-by-click: [step-by-step guide, Part 4](docs/step-by-step-guide.md#part-4-add-it-to-home-assistant).
 3. **Edit** `host:` and `port:` near the top to match your gateway.
 4. **Check and restart:** Developer Tools → YAML → Check configuration, then restart.
 5. **Stop any other client** on that gateway port (including `tcl_modbus.py`).
@@ -198,7 +203,8 @@ Confidence levels, unknown registers and the evidence for each entry:
 |---|---|
 | [docs/hardware-setup.md](docs/hardware-setup.md) | Board connectors, wiring, gateway settings, what didn't work |
 | [docs/register-map.md](docs/register-map.md) | Full register map with confidence levels |
-| [homeassistant/](homeassistant/) | Read-only Home Assistant package |
+| [docs/step-by-step-guide.md](docs/step-by-step-guide.md) | Beginner guide: wiring to dashboard, no command line |
+| [homeassistant/](homeassistant/) | Home Assistant package: thermostat, function switches, sensors |
 | [tools/tcl_modbus.py](tools/tcl_modbus.py) | Read-only probe: `scan`, `dump`, `watch` |
 | [tools/make_ha_package.py](tools/make_ha_package.py) | Generates a Home Assistant package per unit |
 | [captures/](captures/) | Raw logs behind every finding; start with `port2-decode-session1-notes.md` |
